@@ -12,5 +12,4 @@ public class Rocket : Interactable
 		_convertToFuelMenu.SetActive(true);
 		Time.timeScale = 0f;
 	}
-	
 }

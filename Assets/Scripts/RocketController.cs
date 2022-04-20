@@ -6,14 +6,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
-/*
- * NO SOLID)
- */
-
 public class RocketController : MonoBehaviour
 {
-
-
 	#region Veriables
 	[Header("Movement")]
 	[SerializeField]	private			float			_moveSpeed = 1;
@@ -24,33 +18,33 @@ public class RocketController : MonoBehaviour
 	[SerializeField]	private			float			_sphereRadius = 0.2f;
 
 	[Header("BlackHole")]
-	[SerializeField]	private			Transform		_blackHole;
+	[SerializeField]	private			Transform		_blackHole = null;
 	[SerializeField]	private			float			_blackHoleEffect = 5f;
 
 	[Header("Camera")]
-	[SerializeField]	private			Camera			_playerCamera;
+	[SerializeField]	private			Camera			_playerCamera = null;
 
 	[Header("Marker")]
-	[SerializeField]	private			Transform		_markPrefab;
+	[SerializeField]	private			Transform		_markPrefab = null;
 
 	[Header("Layers")]
 	[SerializeField]	private			LayerMask		_interactacable;	
 	[SerializeField]	private			LayerMask		_markers;	
 	
 	[Header("PlayerMenu")] 
-	[SerializeField]	private			GameObject		_menu;
+	[SerializeField]	private			GameObject		_menu = null;
 
 	[Header("PlayerMenu")]
-	[SerializeField]	private			ParticleSystem	_flame;
+	[SerializeField]	private			ParticleSystem	_flame = null;
 						private			Vector3			_moveVector { get; set; }
 						private			Vector3			_pointToMove;
+						private			Vector3			_directionToTarget;
 						private			float			_stopDistance;
 						private			bool			_canMove = true;
 						private			bool			_hasArrived = true;
-						private			GameObject		_mark;
-						private			Interactable	_focus;
-						private			bool			_priviousFlameState;
-						private			bool 			_isMove;
+						private			GameObject		_mark = null;
+						private			Interactable	_focus = null;
+						private			bool 			_isMove = false;
 	
 	#endregion
 	void Start()
@@ -72,38 +66,35 @@ public class RocketController : MonoBehaviour
 				SetTarget();						//Set target object to which ship will go
 		}
 		FlameControll(_isMove);
+		FuelManager.Instance.isSmallSpaceShipMove = _isMove;
 		if (FuelManager.Instance.hasSpaceShipFuel)			// If fuel is ended we cant move
 		{
 			ChackForObsticle(); //chack if in front of ship is obsticle
 			if (!_hasArrived)	//if ship is arrived stop move
 			{  
 				Move();
-				FuelManager.Instance.isSmallSpaceShipMove = _isMove;
+				RototeShip();
 			}
 		}
 		else
 		{
-			FlameControll(false);
+			_isMove = false;
 		}
 	}
 	#region Movement
 	private void Move()
 	{
-		Vector3 directionToTarget = transform.position - _pointToMove;				//--\
-		Quaternion rotationToTarget = Quaternion.LookRotation(directionToTarget);	//--|Must be other method "Rotate" but...
-		transform.rotation = Quaternion.RotateTowards(transform.rotation,			//--|
-			rotationToTarget, _rotationSpeed * Time.deltaTime);						//--/
-		_moveVector = -transform.forward * _moveSpeed * Time.deltaTime;
-		if (_canMove)
+		_directionToTarget = transform.position - _pointToMove;
+
+		if (_canMove) 
 		{
-			if (Vector3.Distance(transform.position, _pointToMove) > _stopDistance)
+			if (Vector3.Distance(transform.position, _pointToMove) > _stopDistance) 
 			{
 				float distanceToTarget = Vector3.Distance(transform.position, _pointToMove);
-				transform.rotation = Quaternion.RotateTowards(transform.rotation, rotationToTarget, _rotationSpeed * Time.deltaTime);
 				_moveVector = -transform.forward * _moveSpeed * Time.deltaTime;
 
 				if (_moveVector.magnitude > distanceToTarget)
-					_moveVector = directionToTarget; //directionToTarget also represents how vector must change;
+					_moveVector = _directionToTarget; //directionToTarget also represents how vector must change;
 
 				transform.Translate(_moveVector, Space.World);
 				 _isMove = true;
@@ -121,6 +112,12 @@ public class RocketController : MonoBehaviour
 		}
 	}
 	#endregion
+	private void RototeShip()
+	{
+		Quaternion rotationToTarget = Quaternion.LookRotation(_directionToTarget);   
+		transform.rotation = Quaternion.RotateTowards(transform.rotation,           
+			rotationToTarget, _rotationSpeed * Time.deltaTime);
+	}
 	#region SetMethods
 	private void SetPointToMove()
 	{
@@ -196,8 +193,9 @@ public class RocketController : MonoBehaviour
 	{
 		if (_menu.activeSelf)
 			_menu.SetActive(false);
-		else 
-			_menu.SetActive(true); 
+		else
+			_menu.SetActive(true);
+		
 	}
 	private void FlameControll(bool isWorking)
 	{
@@ -211,6 +209,6 @@ public class RocketController : MonoBehaviour
 
 		float lerpedSpeed = Mathf.Lerp(main.startSpeed.constant, particalsSpeed, 0.5f);
 		main.startSpeed = lerpedSpeed;
-		_priviousFlameState = isWorking;		
+		
 	}
 }
