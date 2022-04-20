@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Arrow : MonoBehaviour
 {
-	[SerializeField] private			Transform			_rocket;
+	[SerializeField] private Transform _rocket;
 	[SerializeField] private RectTransform _arrow;
 	[SerializeField] private Camera _playerCamera;
 
