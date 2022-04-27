@@ -1,8 +1,6 @@
- using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.Audio;
+using System.Collections;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
@@ -20,6 +18,7 @@ public class RocketController : MonoBehaviour
 	[Header("BlackHole")]
 	[SerializeField] private Transform _blackHole = null;
 	[SerializeField] private float _blackHoleEffect = 5f;
+	[SerializeField] private float distanceToDie = 30f;
 
 	[Header("Camera")]
 	[SerializeField] private Camera _playerCamera = null;
@@ -34,8 +33,16 @@ public class RocketController : MonoBehaviour
 	[Header("PlayerMenu")]
 	[SerializeField] private GameObject _menu = null;
 
-	[Header("PlayerMenu")]
+	[Header("Flame")]
 	[SerializeField] private ParticleSystem _flame = null;
+	
+	[Header("Audio")]
+	[SerializeField] private AudioSource _flameSound;
+	[SerializeField] private float _flameSoundMaxVolume;
+	[SerializeField] private AudioMixerGroup _audioEffectsMixer;
+
+	[Header("GameOver")]
+	[SerializeField] private GameObject _gameOver;
 	private Vector3 _moveVector { get; set; }
 	private Vector3 _pointToMove;
 	private Vector3 _directionToTarget;
@@ -51,13 +58,19 @@ public class RocketController : MonoBehaviour
 	{
 		_pointToMove = transform.position;
 		_stopDistance = _stopDistanceToDistinationPoint;
+		_flameSoundMaxVolume = _flameSound.volume;
+		_flameSound.volume = 0f;
 	}
 	void Update()
 	{
-
+		AudioEffectsOnOff();
 		HoleEffect();   //black hole gravitation
+		if (FuelManager.Instance._rocketFuel == 0)
+			GameOver();
+
 		if (Input.GetKeyDown(KeyCode.Escape))
 			EnableDisableMenu();
+		
 		if (!EventSystem.current.IsPointerOverGameObject()) // Chack if pointer over UI element
 		{
 			if (Input.GetMouseButtonDown(0))
@@ -65,8 +78,7 @@ public class RocketController : MonoBehaviour
 			if (Input.GetMouseButtonDown(1))
 				SetTarget();                        //Set target object to which ship will go
 		}
-		FlameControll(_isMove);
-		FuelManager.Instance.isSmallSpaceShipMove = _isMove;
+
 		if (FuelManager.Instance.hasSpaceShipFuel)          // If fuel is ended we cant move
 		{
 			ChackForObsticle(); //chack if in front of ship is obsticle
@@ -80,6 +92,8 @@ public class RocketController : MonoBehaviour
 		{
 			_isMove = false;
 		}
+		FuelManager.Instance.isSmallSpaceShipMove = _isMove;
+		FlameControll(_isMove);
 	}
 	#region Movement
 	private void Move()
@@ -111,13 +125,18 @@ public class RocketController : MonoBehaviour
 			_isMove = false;
 		}
 	}
-	#endregion
+
 	private void RototeShip()
 	{
+		float addativeRotation = 180 / _directionToTarget.magnitude;
+
 		Quaternion rotationToTarget = Quaternion.LookRotation(_directionToTarget);
 		transform.rotation = Quaternion.RotateTowards(transform.rotation,
-			rotationToTarget, _rotationSpeed * Time.deltaTime);
+			rotationToTarget, (_rotationSpeed + addativeRotation) * Time.deltaTime);
+
+
 	}
+	#endregion
 	#region SetMethods
 	private void SetPointToMove()
 	{
@@ -126,6 +145,7 @@ public class RocketController : MonoBehaviour
 		RaycastHit hit;
 		if (Physics.Raycast(ray, out hit, 200f, _markers, QueryTriggerInteraction.Collide))
 		{
+			Debug.Log(hit.collider.name);
 			if (_focus != null)
 				RemoveFocus();
 
@@ -170,6 +190,10 @@ public class RocketController : MonoBehaviour
 	private void HoleEffect()
 	{
 		float distanceBetweenHoleAndPlayer = Vector3.Distance(_blackHole.position, transform.position);
+		if(distanceBetweenHoleAndPlayer < distanceToDie)
+		{
+			GameOver();
+		}
 		Vector3 holeEffect = (_blackHole.position - transform.position).normalized * _blackHoleEffect / Mathf.Pow(distanceBetweenHoleAndPlayer, 2f);
 		transform.Translate(holeEffect * Time.deltaTime, Space.World);
 	}
@@ -202,14 +226,42 @@ public class RocketController : MonoBehaviour
 	{
 		var main = _flame.main;
 		float particalsSpeed;
-
+		float flameSoundVolume;
 		if (isWorking)
+		{
 			particalsSpeed = 5f;
+			flameSoundVolume = _flameSoundMaxVolume;
+		}
 		else
-			particalsSpeed = 0f;
+		{
+			particalsSpeed = flameSoundVolume = 0f;
 
+		}
 		float lerpedSpeed = Mathf.Lerp(main.startSpeed.constant, particalsSpeed, 0.5f);
+		float lerpedFlameSound = Mathf.Lerp(_flameSound.volume, flameSoundVolume, 0.5f);
 		main.startSpeed = lerpedSpeed;
-
+		_flameSound.volume = lerpedFlameSound;
+		
+	}
+	private void AudioEffectsOnOff()
+	{
+		if(Time.timeScale == 1f)
+		{
+			_audioEffectsMixer.audioMixer.SetFloat("EffectsVolume", 0);
+		}
+		else
+		{
+			_audioEffectsMixer.audioMixer.SetFloat("EffectsVolume", -80);
+		}
+	}
+	public void GameOver()
+	{
+		_gameOver.SetActive(true);
+		StartCoroutine(LoadScene());
+	}
+	IEnumerator LoadScene()
+	{
+		yield return new WaitForSeconds(3f);
+		SceneManager.LoadScene(0);
 	}
 }

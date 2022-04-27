@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.UI;
 
 public class ChangeFuelToConvert : MonoBehaviour
@@ -13,18 +14,16 @@ public class ChangeFuelToConvert : MonoBehaviour
     {
         _value.value = 1f;
     }
-    private void Update()
-    {
-        if (Time.timeScale == 1f)
-        {
-            Time.timeScale = 0f;
-        }
-    }
     public void UpdateValue()
 	{
         _text.text = (int)(_value.value * 100) + " %";
 	}
-    public void ReturnTime()
+	private void OnEnable()
+	{
+        Time.timeScale = 0f;
+        
+    }
+	private void OnDisable()
 	{
         Time.timeScale = 1f;
     }

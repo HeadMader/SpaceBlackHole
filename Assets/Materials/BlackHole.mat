@@ -2,14 +2,15 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: BlackHole
   m_Shader: {fileID: -6465566751694194690, guid: 2ddd57544dabbff45989a9b6086a193a, type: 3}
-  m_ShaderKeywords: 
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -75,8 +76,15 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
-    - Vector1_c3cc509d9d584b92b0ce293345764eac: 3.16
+    - Boolean_bda19d12db004ad0bfdea7c04d184ee8: 1
+    - Vector1_0c57e5a58672438db5a6b97487b6cfc1: 0
+    - Vector1_1: 152.9
+    - Vector1_8d140809973f458ba03b01cd41c1468b: -14.6
+    - Vector1_8d72eb3643df460cbe9f1e8bd90763a7: -23.9
+    - Vector1_c3cc509d9d584b92b0ce293345764eac: 2.57
+    - Vector1_dca73ccd839e476e9e39fa82e3930b42: 0
     - _AlphaClip: 0
     - _Blend: 0
     - _BumpScale: 1
@@ -94,6 +102,7 @@ Material:
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
+    - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1
     - _Smoothness: 0.5
@@ -104,7 +113,11 @@ Material:
     - _WorkflowMode: 1
     - _ZWrite: 1
     m_Colors:
-    - Color_bb8596995aa54ca192c81868e21ce83d: {r: 0, g: 0.6364202, b: 1, a: 0}
+    - Color_54a0c08b0a5c48ffbeb7501285f63ec2: {r: 0.254717, g: 0.254717, b: 0.254717, a: 1}
+    - Color_57c8111f08a74ed2838ae40f8372d7dc: {r: 0, g: 0, b: 0, a: 0}
+    - Color_886c4f3084d14e6c9d8042bafa0a3433: {r: 0, g: 0, b: 0, a: 0}
+    - Color_af69c9a2688944589ccaae35a715f7e2: {r: 1, g: 1, b: 1, a: 0}
+    - Color_bb8596995aa54ca192c81868e21ce83d: {r: 10.432951, g: 9.886723, b: 0, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
@@ -122,4 +135,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  version: 4
+  version: 5

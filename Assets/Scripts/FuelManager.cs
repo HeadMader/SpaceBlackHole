@@ -30,14 +30,11 @@ public class FuelManager : MonoBehaviour
 	[SerializeField] private float _maxRocketFuel = 500;
 	[SerializeField] private float _maxAmountOfMethane = 400;
 	[SerializeField] private float _maxAmountOfOxygen = 200;
-
-	[Header("GameOverScene")]
-	[SerializeField] private SceneAsset GameOverScene;
-
 	private float _amountOfMethane = 400f;
 	private float _amountOfOxygen = 200f;
-	private float _rocketFuel = 50f;
-
+	
+	[HideInInspector]
+	public float _rocketFuel = 50f;
 	[HideInInspector]
 	public bool isSmallSpaceShipMove = false;
 	[HideInInspector]
@@ -53,11 +50,7 @@ public class FuelManager : MonoBehaviour
 	void Update()
 	{
 		
-		if (_rocketFuel <= 0)
-		{
-			GameOver();
-			return;
-		}
+
 		if (isSmallSpaceShipMove)
 		{
 			SpaceShipUseFuel();
@@ -148,10 +141,6 @@ public class FuelManager : MonoBehaviour
 		_rocketFuelIndicator.value = ratioOfFuel;
 		_methaneIndicator.value = ratioOfMethane;
 		_oxygenIndicator.value = ratioOfOxygen;
-	}
-	private void GameOver()
-	{
-		SceneManager.LoadScene(GameOverScene.name);
 	}
 
 }

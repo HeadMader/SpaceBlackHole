@@ -1,19 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 
 public class Arrow : MonoBehaviour
 {
+
 	[SerializeField] private Transform _rocket;
 	[SerializeField] private RectTransform _arrow;
-	[SerializeField] private Camera _playerCamera;
+	[SerializeField] private Camera _arrowCamera;
 
 	[Header("Offset")]
 	[SerializeField] private float _offset = 50f;
 
-	private float _halfScreenWidth;
-	private float _halfScreenHeight;
+	private float _halfScreenWidthWithOffset;
+	private float _halfScreenHeightWithOffset;
 	private Rect _screenRect;
+	private Vector2 _centerOfScreen;
+
 	void Start()
 	{
 
@@ -23,14 +28,16 @@ public class Arrow : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-
 		PointToTarget();
-		_halfScreenWidth = (float)Screen.width / 2 - _offset;
-		_halfScreenHeight = (float)Screen.height / 2 - _offset;
+		_centerOfScreen = new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
+		_halfScreenWidthWithOffset = (float)Screen.width / 2 - _offset;
+		_halfScreenHeightWithOffset = (float)Screen.height / 2 - _offset;
 	}
+
 	private void PointToTarget()
 	{
-		Vector2 targetOnScreen = _playerCamera.WorldToScreenPoint(_rocket.position);
+		Vector2 targetOnScreen = _arrowCamera.WorldToScreenPoint(_rocket.position);
+
 		if (_screenRect.Contains(targetOnScreen))
 		{
 			_arrow.gameObject.SetActive(false);
@@ -38,21 +45,23 @@ public class Arrow : MonoBehaviour
 		}
 		else
 			_arrow.gameObject.SetActive(true);
-		Vector2 vectorToTarget = targetOnScreen - new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
+
+		Vector2 vectorToTarget = targetOnScreen - _centerOfScreen;
 		_arrow.rotation = Quaternion.FromToRotation(Vector3.up, vectorToTarget);
-		//  transform.position = vectorToTarget.normalized * 200 + new Vector2(halfScreenWidth, halfScreenHeight);
+
+		//_arrow.position = vectorToTarget.normalized * 200 + new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
 		Vector2 normVectorToTarget;
 
-
-		float screenRatio = _halfScreenWidth / _halfScreenHeight;
+		float screenRatio = _halfScreenWidthWithOffset / _halfScreenHeightWithOffset;
 		float vectorRatio = Mathf.Abs(vectorToTarget.x / vectorToTarget.y);
 
 		if (screenRatio <= vectorRatio)
-			normVectorToTarget = Vector2.ClampMagnitude(vectorToTarget, vectorToTarget.magnitude * (_halfScreenWidth / Mathf.Abs(vectorToTarget.x)));
+			normVectorToTarget = Vector2.ClampMagnitude(vectorToTarget, vectorToTarget.magnitude * (_halfScreenWidthWithOffset / Mathf.Abs(vectorToTarget.x)));
 		else
-			normVectorToTarget = Vector2.ClampMagnitude(vectorToTarget, vectorToTarget.magnitude * (_halfScreenHeight / Mathf.Abs(vectorToTarget.y)));
+			normVectorToTarget = Vector2.ClampMagnitude(vectorToTarget, vectorToTarget.magnitude * (_halfScreenHeightWithOffset / Mathf.Abs(vectorToTarget.y)));
 
-		_arrow.position = normVectorToTarget + new Vector2((float)Screen.width / 2, (float)Screen.height / 2);
+		_arrow.position = normVectorToTarget + _centerOfScreen;
 
 	}
 }
+
