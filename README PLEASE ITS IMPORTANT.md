@@ -1,2 +1,2 @@
 # SpaceBlackHole
-To play game go 
+TO PLAY GAME GO https://headmad.itch.io/space-black-hole
